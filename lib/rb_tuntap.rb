@@ -1,4 +1,4 @@
-require 'ipaddr_extensions'
+require 'ipaddr'
 require 'rb_tuntap_ext'
 
 module RbTunTap
@@ -81,8 +81,8 @@ module RbTunTap
         raise NotImplementedError, 'Only IPv4 is supported by this library'
       end
 
-      unless ip.host?
-        raise ArgumentError, 'IP specified is not a host address'
+      if addr.include?('/')
+        raise ArgumentError, 'Please specify a host IP address (without a mask)'
       end
 
       addr.to_s

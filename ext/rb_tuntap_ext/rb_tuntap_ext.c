@@ -72,7 +72,7 @@ static VALUE device_initialize(VALUE self,
   return self;
 }
 
-static VALUE device_open(VALUE self) {
+static VALUE device_open(VALUE self, VALUE no_pi) {
 
   int fd = -1;
   struct ifreq req;
@@ -87,7 +87,11 @@ static VALUE device_open(VALUE self) {
 
   /* Setup the device */
   strcpy(req.ifr_name, ivar_to_cstr(self, "@name")); /* set name */
-  req.ifr_flags = NUM2INT(rb_iv_get(self, "@type"));      /* set type */
+  req.ifr_flags = NUM2INT(rb_iv_get(self, "@type")); /* set type */
+
+  if(RTEST(no_pi)) {
+    req.ifr_flags |= IFF_NO_PI;
+  }
 
   if(ioctl(fd, TUNSETIFF, &req) < 0) {
     rb_sys_fail("ioctl failed on device");
@@ -399,7 +403,7 @@ void Init_rb_tuntap_ext() {
   VALUE c_device = rb_define_class_under(c_tuntap, "Device", rb_cObject);
 
   rb_define_method(c_device, "initialize"  , device_initialize  , 3);
-  rb_define_method(c_device, "open"        , device_open        , 0);
+  rb_define_method(c_device, "open"        , device_open        , 1);
   rb_define_method(c_device, "close"       , device_close       , 0);
 
   rb_define_method(c_device, "set_addr"    , device_set_addr    , 1);
