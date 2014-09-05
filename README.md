@@ -1,6 +1,8 @@
+[![Analytics](https://ga-beacon.appspot.com/UA-54497177-2/rb_tuntap/readme)](https://github.com/igrigorik/ga-beacon)
+
 # RbTunTap
 
-This is a simple library to manipulate (create, configure, persist, delete) tun and tap interfaces (for Linux). Most of the library is implemented as a C extension since it needs to request the creation/deletion/configuration of the interfaces from the kernel via syscalls. The ruby land code serves to provide a simpler API for ruby programs to interface with.
+This is a simple library to manipulate (create, configure, persist, delete) tun and tap interfaces (for Linux). Most of the library is implemented as a C extension since it needs to request the changes (creation, deletion, etc.) of the interfaces from the kernel via syscalls. The ruby land wrapper code provides a simpler API for ruby programs to interface with.
 
 ## What are tun/tap interfaces?
 
