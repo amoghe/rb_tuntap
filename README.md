@@ -71,6 +71,13 @@ tio = tun.to_io
 tio.read(4)
 ```
 
+Finally, don't forget to clean up
+
+```ruby
+tun.down
+tun.close
+```
+
 See the examples directory for a script that demonstrates similar usage of this gem.
 
 ## Contributing
