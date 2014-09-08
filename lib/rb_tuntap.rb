@@ -10,7 +10,7 @@ module RbTunTap
   class Device
 
     def to_io
-      IO.new(fd)
+      @io ||= IO.new(fd)
     end
 
     def opened?
