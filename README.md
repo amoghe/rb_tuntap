@@ -26,7 +26,43 @@ Or install it yourself as:
 
 ## Usage
 
-See the examples directory for basic usage.
+Creating a tun device is as easy as:
+
+```ruby
+tun = RbTunTap::TunDevice.new(DEV_NAME)
+tun.open(true)
+```
+
+Similarly tap devices are created like this:
+
+```ruby
+tap = RbTunTap::TapDevice.new(DEV_NAME)
+tap.open(true)
+```
+
+The parameter to the ```open()``` method determines whether the tun device will return packets with additional metadata from the kernel (i.e. - sets the ```IFF_NO_PI``` flag accordingly).
+
+Next, you'll want to configure the (tun) device:
+
+```ruby
+tun.addr = "192.168.1.4"
+tun.netmask = "255.255.255.0"
+```
+
+And then bring up the interface, maybe persisting it:
+
+```ruby
+tun.up
+tun.persist(true) # pass false to undo
+```
+
+For tap devices, you may want to also set the hardware address:
+
+```ruby
+tap.hwaddr = DEV_HWADDR
+```
+
+See the examples directory for a script that demonstrates similar usage of this gem.
 
 ## Contributing
 
