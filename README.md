@@ -6,9 +6,11 @@ This is a simple library to manipulate (create, configure, persist, delete) tun 
 
 These interfaces provide packet reception and transmission capabilities for userspace programs. They work with IP and Ethernet frames respectively. [This][1] is a good primer on what these interfaces are and what they are capable of. 
 
-## Installation
+## Platforms
 
-Currently this is only developed (and tested) on Linux (Ubuntu 12.04 and 14.04). It should work on other (modern) Linux distributions as well.
+Currently this is only developed (and tested) on Linux (Ubuntu 12.04 and 14.04). It should work on other (modern) Linux kernels/distributions as well (kernels that ship with most popular distributions support this).
+
+## Installation
 
 Add this line to your application's Gemfile:
 
@@ -60,6 +62,13 @@ For tap devices, you may want to also set the hardware address:
 
 ```ruby
 tap.hwaddr = DEV_HWADDR
+```
+
+Reading from the device(s) can be done via the IO object they return
+
+```ruby
+tio = tun.to_io
+tio.read(4)
 ```
 
 See the examples directory for a script that demonstrates similar usage of this gem.
