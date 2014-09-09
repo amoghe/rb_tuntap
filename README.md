@@ -8,7 +8,7 @@ These interfaces provide packet reception and transmission capabilities for user
 
 ## Platforms
 
-Currently this is only developed (and tested) on Linux (Ubuntu 12.04 and 14.04). It should work on other (modern) Linux kernels/distributions as well (kernels that ship with most popular distributions support this).
+Currently this is only developed (and tested) on Linux (Ubuntu 12.04 and 14.04), however it should work on other (modern) Linux kernels/distributions as well (kernels that ship with most popular distributions support this).
 
 ## Installation
 
@@ -31,14 +31,14 @@ Or install it yourself as:
 Creating a tun device is as easy as:
 
 ```ruby
-tun = RbTunTap::TunDevice.new(DEV_NAME)
+tun = RbTunTap::TunDevice.new(DEV_NAME) # DEV_NAME = 'tun0'
 tun.open(false)
 ```
 
 Similarly tap devices are created like this:
 
 ```ruby
-tap = RbTunTap::TapDevice.new(DEV_NAME)
+tap = RbTunTap::TapDevice.new(DEV_NAME) # DEV_NAME = 'tap0'
 tap.open(false)
 ```
 
@@ -68,7 +68,7 @@ tun.persist(true) # false to undo
 You may want to also set the hardware address:
 
 ```ruby
-tap.hwaddr = DEV_HWADDR # Probably something like "9a:34:76:31:b5:6a"
+tap.hwaddr = DEV_HWADDR # e.g. "9a:34:76:31:b5:6a"
 ```
 
 Reading from the device(s) can be done via the IO object they return (note that you probably want to use ```IO#readpartial``` or ```IO#sysread``` to read at least ```mtu``` bytes from the device thereby ensuring you are reading off entire packets/frames)
