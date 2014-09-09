@@ -201,30 +201,38 @@ static VALUE device_get_dstaddr(VALUE self)
   return rb_str_new2(cdstaddr);
 }
 
-static VALUE device_set_hwaddr(VALUE self, VALUE hwaddr) {
+static VALUE device_set_hwaddr(VALUE self, VALUE hwaddr_bytes) {
   struct ifreq req;
+  int i = 0;
 
-  Check_Type(hwaddr, T_STRING);
+  Check_Type(hwaddr_bytes, T_ARRAY);
 
-  if (RSTRING_LEN(hwaddr) != ETH_ALEN) {
+  /* ETH_ALEN is the number of octets in one ethernet address */
+
+  if (RARRAY_LEN(hwaddr_bytes) != ETH_ALEN) {
     rb_raise(rb_eArgError, "Invalid MAC address");
   }
 
   memset(&req, 0, sizeof(req));
   req.ifr_hwaddr.sa_family = ARPHRD_ETHER;
   strcpy(req.ifr_name, RSTRING_PTR(rb_iv_get(self, "@name")));
-  memcpy(req.ifr_hwaddr.sa_data, RSTRING_PTR(hwaddr), RSTRING_LEN(hwaddr));
+
+  for(i = 0; i < ETH_ALEN; i++) {
+    req.ifr_hwaddr.sa_data[i] = NUM2INT(rb_ary_entry(hwaddr_bytes, i));
+  }
 
   if (socket_ioctl(SIOCSIFHWADDR, &req) < 0) {
     rb_sys_fail("Failed to call ioctl on socket");
   }
 
-  return hwaddr;
+  return hwaddr_bytes;
 }
 
 static VALUE device_get_hwaddr(VALUE self)
 {
   struct ifreq req;
+  int   i   = 0;
+  VALUE ret = NULL;
 
   memset(&req, 0, sizeof(req));
   strcpy(req.ifr_name, ivar_to_cstr(self, "@name"));
@@ -233,7 +241,16 @@ static VALUE device_get_hwaddr(VALUE self)
     rb_sys_fail("Failed to call ioctl on socket");
   }
 
-  return rb_str_new2(req.ifr_hwaddr.sa_data);
+  ret = rb_ary_new3(ETH_ALEN);
+  if(!ret) {
+    rb_raise(rb_eArgError, "Internal error - unable to alloc array");
+  }
+
+  for(i = 0; i < ETH_ALEN; i++) {
+    rb_ary_store(ret, i, UINT2NUM((unsigned char)req.ifr_hwaddr.sa_data[i]));
+  }
+
+  return ret;
 }
 
 static VALUE device_set_netmask(VALUE self, VALUE netmask) {

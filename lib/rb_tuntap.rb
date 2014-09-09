@@ -54,11 +54,24 @@ module RbTunTap
     end
 
     def hwaddr=(hw)
-      set_hwaddr(hw)
+      unless hw.is_a? String
+        raise ArgumentError, 'Argument must be a String'
+      end
+
+      unless hw.split(':').count == 6
+        raise ArgumentError, 'Invalid address string specified'
+      end
+
+      hwintarr = hw.split(':').map { |tok| tok.hex }
+
+      set_hwaddr(hwintarr)
     end
 
     def hwaddr
-      get_hwaddr
+      ret = ""
+      get_hwaddr.map { |int|
+        int.to_s(16)
+      }.join(':')
     end
 
     def mtu=(m)
