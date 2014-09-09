@@ -72,7 +72,7 @@ static VALUE device_initialize(VALUE self,
   return self;
 }
 
-static VALUE device_open(VALUE self, VALUE no_pi) {
+static VALUE device_open(VALUE self, VALUE pkt_info) {
 
   int fd = -1;
   struct ifreq req;
@@ -89,8 +89,14 @@ static VALUE device_open(VALUE self, VALUE no_pi) {
   strcpy(req.ifr_name, ivar_to_cstr(self, "@name")); /* set name */
   req.ifr_flags = NUM2INT(rb_iv_get(self, "@type")); /* set type */
 
-  if(RTEST(no_pi)) {
-    req.ifr_flags |= IFF_NO_PI;
+  /* This is a little confusing, since the param to the function is pkt_info 
+   * however the flags indicate NO_PI (NO_pkt_info). So set the bit when user
+   * doesn't want PI, and clear the bit if the user has asked for PI
+   */
+  switch(TYPE(pkt_info)) {
+  case T_TRUE : req.ifr_flags &= ~IFF_NO_PI         ; break ;
+  case T_FALSE: req.ifr_flags |=  IFF_NO_PI         ; break ;
+  default: rb_raise(rb_eArgError, "Bad pkt_info param"); break ;
   }
 
   if(ioctl(fd, TUNSETIFF, &req) < 0) {
