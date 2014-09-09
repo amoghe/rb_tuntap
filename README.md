@@ -28,6 +28,8 @@ Or install it yourself as:
 
 ## Usage
 
+### Creating interfaces
+
 Creating a tun device is as easy as:
 
 ```ruby
@@ -50,6 +52,8 @@ If ```pkt_info``` is requested, then each frame format is:
   Proto [2 bytes]
   Raw protocol(IP, IPv6, etc) frame.
 ```
+
+### Configuring interfaces
 
 Next, you'll want to configure the device (e.g. tun):
 
@@ -76,11 +80,18 @@ You may want to also set the hardware address:
 tap.hwaddr = DEV_HWADDR # e.g. "9a:34:76:31:b5:6a"
 ```
 
-Reading from the device(s) can be done via the IO object they return (note that you probably want to use ```IO#readpartial``` or ```IO#sysread``` to read at least ```mtu``` bytes from the device thereby ensuring you are reading off entire packets/frames)
+### Reading from interfaces
+
+Reading from the device(s) can be done via the IO object they return
 
 ```ruby
 tio = tun.to_io
-tio.sysread(tun.mtu)
+```
+
+Note that you probably want to use ```IO#readpartial``` or ```IO#sysread``` to read at least ```mtu``` bytes from the device thereby ensuring you are reading off entire packets/frames.
+
+```ruby
+raw_ip = tun.to_io.sysread(tun.mtu)
 ```
 
 You can get some really convenient (eth) packet parsing using tap interfaces and the [PacketFu][3] gem:
@@ -142,8 +153,8 @@ irb(main)> eth = PacketFu::EthPacket.new
 # Set its payload to be the IP packet we just read
 irb(main)> eth.payload = ip
 
-# Now create a packetfu IPPacket using this eth packet
-irb(main)> PacketFu::IPPacket.new.read(eth.to_s)
+# Now create a packetfu ICMPPacket using this eth packet
+irb(main)> PacketFu::ICMPPacket.new.read(eth.to_s)
 => --EthHeader-----------------------------------
   eth_dst   00:01:ac:00:00:00 PacketFu::EthMac
   eth_src   00:01:ac:00:00:00 PacketFu::EthMac
@@ -160,6 +171,10 @@ irb(main)> PacketFu::IPPacket.new.read(eth.to_s)
   ip_sum    0xa98d            StructFu::Int16
   ip_src    192.168.168.1     PacketFu::Octets
   ip_dst    192.168.168.14    PacketFu::Octets
+--ICMPHeader----------------------------------
+  icmp_type 8                 StructFu::Int8
+  icmp_code 0                 StructFu::Int8
+  icmp_sum  0xde39            StructFu::Int16
 
 ----- 8< OUTPUT SNIPPED 8< -----
 ```
