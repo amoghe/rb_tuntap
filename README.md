@@ -32,17 +32,24 @@ Creating a tun device is as easy as:
 
 ```ruby
 tun = RbTunTap::TunDevice.new(DEV_NAME)
-tun.open(true)
+tun.open(false)
 ```
 
 Similarly tap devices are created like this:
 
 ```ruby
 tap = RbTunTap::TapDevice.new(DEV_NAME)
-tap.open(true)
+tap.open(false)
 ```
 
-The parameter to the ```open()``` method determines whether the tun device will return packets with additional metadata from the kernel (i.e. - sets the ```IFF_NO_PI``` flag accordingly).
+The parameter to the ```#open(pkt_info)``` method determines whether the device will return packet info metadata with with each packet (i.e. - sets the ```IFF_NO_PI``` flag accordingly).
+
+If ```pkt_info``` is requested, then each frame format is:
+```
+  Flags [2 bytes]
+  Proto [2 bytes]
+  Raw protocol(IP, IPv6, etc) frame.
+```
 
 Next, you'll want to configure the (tun) device:
 
@@ -71,13 +78,14 @@ tio = tun.to_io
 tio.sysread(tun.mtu)
 ```
 
-If you use the [PacketFu][3] gem, you can get fancy packet parsing
+You can get some really convenient (eth) packet parsing using the [PacketFu][3] gem:
 
 ```ruby
 irb(main)> require 'packetfu'
 => true
 
-irb(main)> raw = tio.sysread(tun.mtu)
+# Here "tio" is attached to a tap interface so we're reading eth frames
+irb(main)> raw = tio.sysread(tap.mtu)
 
 # From another terminal, attempt to ping 192.168.168.11
 # "raw" will hold the packet we just read off the device.
