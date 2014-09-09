@@ -95,7 +95,7 @@ module RbTunTap
       end
 
       if addr.include?('/')
-        raise ArgumentError, 'Please specify a host IP address (without a mask)'
+        raise ArgumentError, 'Please specify a host IP address (without mask)'
       end
 
       addr.to_s
