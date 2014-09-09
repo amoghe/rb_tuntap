@@ -51,18 +51,23 @@ If ```pkt_info``` is requested, then each frame format is:
   Raw protocol(IP, IPv6, etc) frame.
 ```
 
-Next, you'll want to configure the (tun) device:
+Next, you'll want to configure the device (e.g. tun):
 
 ```ruby
 tun.addr    = "192.168.168.1"
 tun.netmask = "255.255.255.0"
 ```
 
-And then bring up the interface, maybe persisting it:
+And then bring up the interface:
 
 ```ruby
 tun.up
-tun.persist(true) # false to undo
+```
+
+Optionally, persist it:
+
+```ruby
+tun.persist(true) # false to undo persistence
 ```
 
 You may want to also set the hardware address:
@@ -78,14 +83,14 @@ tio = tun.to_io
 tio.sysread(tun.mtu)
 ```
 
-You can get some really convenient (eth) packet parsing using the [PacketFu][3] gem:
+You can get some really convenient (eth) packet parsing using tap interfaces and the [PacketFu][3] gem:
 
 ```ruby
 irb(main)> require 'packetfu'
 => true
 
-# Here "tio" is attached to a tap interface so we're reading eth frames
-irb(main)> raw = tio.sysread(tap.mtu)
+# We're reading an ethernet frame off the tap interface
+irb(main)> raw = tap.to_io.sysread(tap.mtu)
 
 # From another terminal, attempt to ping 192.168.168.11
 # "raw" will hold the packet we just read off the device.
@@ -105,6 +110,58 @@ irb(main)> arp = PacketFu::ARPPacket.new.read(raw)
   arp_src_ip    192.168.168.168   PacketFu::Octets
   arp_dst_mac   00:00:00:00:00:00 PacketFu::EthMac
   arp_dst_ip    192.168.168.11    PacketFu::Octets
+```
+
+Similarly, you can use [PacketFu][3] to parse packets from the tun interface (ip packets) as well. You have to do a little more work since PacketFu works with full ethernet frames:
+
+```ruby
+irb(main)> require 'packetfu'
+=> true
+
+# Assuming the tun interface is up()'ed and assigned valid IP and netmask
+# (192.168.168.1/24 in this example).
+#
+# From another terminal, ensure that the tun interface is serving as the gateway
+# via which its network is reachable. For this example, the routing table is:
+#
+# default via 10.0.2.2 dev eth0
+# 10.0.2.0/24 dev eth0  proto kernel  scope link  src 10.0.2.15
+# 192.168.168.0/24 via 192.168.168.1 dev tun0
+#
+# Note that the tun interface is on the 192.168.168.x network and the route indicates
+# that the 192.168.168.x network is reachable via the tun interface
+#
+# Now trying to ping an imaginary machine on the 192 network (e.g. 192.168.168.14)
+
+# Read a packet off the tun interface
+irb(main)> ip = tun.to_io.sysread(tun.mtu)
+
+# Create an eth packet (using packetfu)
+irb(main)> eth = PacketFu::EthPacket.new
+
+# Set its payload to be the IP packet we just read
+irb(main)> eth.payload = ip
+
+# Now create a packetfu IPPacket using this eth packet
+irb(main)> PacketFu::IPPacket.new.read(eth.to_s)
+=> --EthHeader-----------------------------------
+  eth_dst   00:01:ac:00:00:00 PacketFu::EthMac
+  eth_src   00:01:ac:00:00:00 PacketFu::EthMac
+  eth_proto 0x0800            StructFu::Int16
+--IPHeader------------------------------------
+  ip_v      4                 Fixnum
+  ip_hl     5                 Fixnum
+  ip_tos    0                 StructFu::Int8
+  ip_len    84                StructFu::Int16
+  ip_id     0xbfba            StructFu::Int16
+  ip_frag   16384             StructFu::Int16
+  ip_ttl    64                StructFu::Int8
+  ip_proto  1                 StructFu::Int8
+  ip_sum    0xa98d            StructFu::Int16
+  ip_src    192.168.168.1     PacketFu::Octets
+  ip_dst    192.168.168.14    PacketFu::Octets
+
+----- 8< OUTPUT SNIPPED 8< -----
 ```
 
 Finally, don't forget to clean up
