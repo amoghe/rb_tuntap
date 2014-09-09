@@ -47,7 +47,7 @@ The parameter to the ```open()``` method determines whether the tun device will 
 Next, you'll want to configure the (tun) device:
 
 ```ruby
-tun.addr = "192.168.1.4"
+tun.addr    = "192.168.168.1"
 tun.netmask = "255.255.255.0"
 ```
 
@@ -55,20 +55,48 @@ And then bring up the interface, maybe persisting it:
 
 ```ruby
 tun.up
-tun.persist(true) # pass false to undo
+tun.persist(true) # false to undo
 ```
 
-For tap devices, you may want to also set the hardware address:
+You may want to also set the hardware address:
 
 ```ruby
-tap.hwaddr = DEV_HWADDR
+tap.hwaddr = DEV_HWADDR # Probably something like "9a:34:76:31:b5:6a"
 ```
 
-Reading from the device(s) can be done via the IO object they return
+Reading from the device(s) can be done via the IO object they return (note that you probably want to use ```IO#readpartial``` or ```IO#sysread``` to read at least ```mtu``` bytes from the device thereby ensuring you are reading off entire packets/frames)
 
 ```ruby
 tio = tun.to_io
-tio.read(4)
+tio.sysread(tun.mtu)
+```
+
+If you use the [PacketFu][3] gem, you can get fancy packet parsing
+
+```ruby
+irb(main)> require 'packetfu'
+=> true
+
+irb(main)> raw = tio.sysread(tun.mtu)
+
+# From another terminal, attempt to ping 192.168.168.11
+# "raw" will hold the packet we just read off the device.
+
+irb(main)> arp = PacketFu::ARPPacket.new.read(raw)
+=> --EthHeader---------------------------------------
+  eth_dst       ff:ff:ff:ff:ff:ff PacketFu::EthMac
+  eth_src       9a:34:76:31:b5:6a PacketFu::EthMac
+  eth_proto     0x0806            StructFu::Int16
+--ARPHeader---------------------------------------
+  arp_hw        1                 StructFu::Int16
+  arp_proto     0x0800            StructFu::Int16
+  arp_hw_len    6                 StructFu::Int8
+  arp_proto_len 4                 StructFu::Int8
+  arp_opcode    1                 StructFu::Int16
+  arp_src_mac   9a:34:76:31:b5:6a PacketFu::EthMac
+  arp_src_ip    192.168.168.168   PacketFu::Octets
+  arp_dst_mac   00:00:00:00:00:00 PacketFu::EthMac
+  arp_dst_ip    192.168.168.11    PacketFu::Octets
 ```
 
 Finally, don't forget to clean up
@@ -95,3 +123,4 @@ See the examples directory for a script that demonstrates similar usage of this 
 
 [1]: https://www.kernel.org/doc/Documentation/networking/tuntap.txt
 [2]: https://github.com/[my-github-username]/rb-tuntap/fork
+[3]: https://github.com/packetfu/packetfu
