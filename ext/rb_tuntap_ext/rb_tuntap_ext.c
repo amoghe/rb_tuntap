@@ -395,13 +395,14 @@ void Init_rb_tuntap_ext() {
   /* module TunTap */
   VALUE c_tuntap = rb_define_module("RbTunTap");
 
+  /* class TunTap::Device */
+  VALUE c_device = rb_define_class_under(c_tuntap, "Device", rb_cObject);
+
   /* Constants */
   rb_define_const(c_tuntap, "DEV_TYPE_TUN", INT2NUM(IFF_TUN));
   rb_define_const(c_tuntap, "DEV_TYPE_TAP", INT2NUM(IFF_TAP));
 
-  /* class TunTap::Device */
-  VALUE c_device = rb_define_class_under(c_tuntap, "Device", rb_cObject);
-
+  /* Methods */
   rb_define_method(c_device, "initialize"  , device_initialize  , 3);
   rb_define_method(c_device, "open"        , device_open        , 1);
   rb_define_method(c_device, "close"       , device_close       , 0);
