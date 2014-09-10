@@ -200,7 +200,7 @@ See the examples directory for a script that demonstrates similar usage of this 
 ## TODOs
 
 0. Add multiqueue support (i.e. ```IFF_MULTI_QUEUE```) for parallel access
-1. Enforce rubucop (stylecheck/linting) for rb code
+1. Add documentation for ruby API
 2. Add tests
 
 [1]: https://www.kernel.org/doc/Documentation/networking/tuntap.txt
