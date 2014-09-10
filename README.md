@@ -1,6 +1,6 @@
 # RbTunTap
 
-This is a simple library to manipulate (create, configure, persist, delete) tun and tap interfaces (for Linux). Most of the library is implemented as a C extension since it needs to request the changes (creation, deletion, of interfaces) from the kernel via syscalls. Given the relatively complex structures that are involved, it is easier to do this in C than using ffi. The ruby land wrapper code provides a simpler (more ruby-esque) API for ruby programs to interface with.
+This gem provides the ability to manipulate (create, configure, persist, delete) tun and tap interfaces (for Linux). Most of the library is implemented as a C extension since it needs to request the changes (creation, deletion, of interfaces) from the kernel via syscalls. Given the relatively complex structures that are involved, it is easier to do this in C than using ffi. The ruby land wrapper code provides a simpler (more ruby-esque) API for ruby programs to interface with.
 
 ## What are tun/tap interfaces?
 
@@ -199,6 +199,7 @@ See the examples directory for a script that demonstrates similar usage of this 
 
 ## TODOs
 
+0. Add multiqueue support (i.e. ```IFF_MULTI_QUEUE```) for parallel access
 1. Enforce rubucop (stylecheck/linting) for rb code
 2. Add tests
 
