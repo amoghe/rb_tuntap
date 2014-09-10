@@ -104,7 +104,7 @@ irb(main)> require 'packetfu'
 irb(main)> raw = tap.to_io.sysread(tap.mtu)
 
 # From another terminal, attempt to ping 192.168.168.11
-# "raw" will hold the packet we just read off the device.
+# "raw" holds the packet we just read off the device.
 
 irb(main)> arp = PacketFu::ARPPacket.new.read(raw)
 => --EthHeader---------------------------------------
@@ -190,7 +190,8 @@ See the examples directory for a script that demonstrates similar usage of this 
 
 ## Contributing
 
-1. Fork it ( [from here][2] )
+0. Create an issue, describe the bugfix/feature you wish to implement
+1. Fork the repository ( [from here][2] )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
