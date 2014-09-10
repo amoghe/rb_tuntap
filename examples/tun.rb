@@ -21,7 +21,7 @@ STDOUT.puts("** Reading 4 bytes from the tun device (waiting 5s)")
 begin
   Timeout::timeout(5) {
     io = tun.to_io
-    bytes = io.read(4)
+    bytes = io.sysread(4)
   }
 rescue Timeout::Error
   STDOUT.puts("Nothing to read")
