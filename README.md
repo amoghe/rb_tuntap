@@ -28,6 +28,10 @@ Or install it yourself as:
 
 ## Usage
 
+**NOTE** In order to use this gem you probably need superuser (root) privileges on the system you are on.
+In order for the following examples to work, you need to launch IRB (or your program which uses this gem)
+using `sudo`.
+
 ### Creating interfaces
 
 Creating a tun device is as easy as:
