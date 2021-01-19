@@ -195,6 +195,7 @@ See the examples directory for a script that demonstrates similar usage of this 
 ## Contributing
 
 * Create an issue, describe the bugfix/feature you wish to implement
+* Ensure you have necessary tools (ruby, ruby-dev, git) installed (`apt install ruby ruby-dev` on debian based systems)
 * Fork the repository ( [from here][2] )
 * Ensure you have `bundler` and `rake-compiler` gems installed (`gem install ...`) 
 * Create your feature branch (`git checkout -b my-new-feature`)
