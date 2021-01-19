@@ -194,12 +194,14 @@ See the examples directory for a script that demonstrates similar usage of this 
 
 ## Contributing
 
-0. Create an issue, describe the bugfix/feature you wish to implement
-1. Fork the repository ( [from here][2] )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+* Create an issue, describe the bugfix/feature you wish to implement
+* Fork the repository ( [from here][2] )
+* Ensure you have `bundler` and `rake-compiler` gems installed (`gem install ...`) 
+* Create your feature branch (`git checkout -b my-new-feature`)
+* Commit your changes (`git commit -am 'Add some feature'`)
+* Run `rake build` and `rake compile` to ensure things work (recommended: install locally and run some tests)
+* Push to the branch (`git push origin my-new-feature`)
+* Create a new Pull Request
 
 ## TODOs
 
