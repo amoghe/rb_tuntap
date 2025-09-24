@@ -232,7 +232,7 @@ static VALUE device_get_hwaddr(VALUE self)
 {
   struct ifreq req;
   int   i   = 0;
-  VALUE ret = NULL;
+  VALUE ret = 0;
 
   memset(&req, 0, sizeof(req));
   strcpy(req.ifr_name, ivar_to_cstr(self, "@name"));
@@ -414,7 +414,7 @@ static VALUE device_persist(VALUE self, VALUE persist) {
  * Ruby
  */
 
-void Init_rb_tuntap_ext() {
+void Init_rb_tuntap_ext(void) {
   /* module TunTap */
   VALUE c_tuntap = rb_define_module("RbTunTap");
 
@@ -451,7 +451,7 @@ void Init_rb_tuntap_ext() {
   rb_define_method(c_device, "up"          , device_up          , 0);
   rb_define_method(c_device, "down"        , device_down        , 0);
 
-  rb_define_method(c_device, "persist"     , device_persist     , 0);
+  rb_define_method(c_device, "persist"     , device_persist     , 1);
 
   rb_define_attr(c_device, "fd"  , 1, 0);
   rb_define_attr(c_device, "name", 1, 0);
